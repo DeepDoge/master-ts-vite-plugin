@@ -1,9 +1,8 @@
 {
 	"compilerOptions": {
-		"outDir": "dist",
 		"allowJs": true,
 		"target": "ESNext",
-		"module": "CommonJS",
+		"module": "ESNext",
 		"lib": ["ESNext", "DOM"],
 		"moduleResolution": "Node",
 		"resolveJsonModule": true,
@@ -39,5 +38,5 @@
 		"noFallthroughCasesInSwitch": false,
 		"noPropertyAccessFromIndexSignature": false
 	},
-	"include": ["library"]
+	"include": ["plugin"]
 }
