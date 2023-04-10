@@ -3,6 +3,7 @@ import fs from "fs"
 import { parseLiterals } from "parse-literals"
 import path from "path"
 
+// vite.config.TS doesn't support TS file imports, so we have to do this thing.
 const preprocessorFilename = path.join("node_modules", "master-ts-vite-plugin", "library", "./preprocess.ts")
 const preprocessorTs = fs.readFileSync(preprocessorFilename, "utf8")
 const preprocessorJs = typescript.transpile(preprocessorTs, { module: "commonjs" }, preprocessorFilename)
