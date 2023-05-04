@@ -1,11 +1,17 @@
 {
 	"type": "module",
 	"name": "master-ts-vite-plugin",
+	"scripts": {
+		"format": "prettier -w ./",
+		"postinstall": "npm run format"
+	},
 	"dependencies": {
-		"parse-literals": "^1.2.1",
-		"typescript": "^5.0.4"
+		"parse-literals": "latest",
+		"typescript": "latest"
 	},
 	"devDependencies": {
-		"@types/node": "^18.15.11"
+		"@types/node": "latest",
+		"prettier": "latest",
+		"prettier-plugin-organize-imports": "latest"
 	}
 }
