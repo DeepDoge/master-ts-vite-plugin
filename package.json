@@ -2,8 +2,7 @@
 	"type": "module",
 	"name": "master-ts-vite-plugin",
 	"scripts": {
-		"format": "prettier -w ./",
-		"postinstall": "npm run format"
+		"format": "prettier -w ./"
 	},
 	"dependencies": {
 		"parse-literals": "latest",
