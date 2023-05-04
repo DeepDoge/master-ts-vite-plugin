@@ -6,12 +6,7 @@
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:0-18",
 	"customizations": {
 		"vscode": {
-			"extensions": [
-				"GitHub.vscode-pull-request-github",
-				"eamodio.gitlens",
-				"heltonricardo.heltonricardo-vscode-organize-and-format",
-				"esbenp.prettier-vscode"
-			]
+			"extensions": ["eamodio.gitlens", "esbenp.prettier-vscode"]
 		}
 	},
 
