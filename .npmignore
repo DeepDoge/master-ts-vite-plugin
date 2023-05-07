@@ -4,4 +4,4 @@
 /.gitignore
 /.prettierrc
 /.eslintrc
-/.README.md
+/*.md
