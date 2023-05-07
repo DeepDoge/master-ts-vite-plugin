@@ -11,6 +11,7 @@
 	"devDependencies": {
 		"@types/node": "latest",
 		"prettier": "latest",
-		"prettier-plugin-organize-imports": "latest"
+		"prettier-plugin-organize-imports": "latest",
+		"@typescript-eslint/eslint-plugin": "latest"
 	}
 }
