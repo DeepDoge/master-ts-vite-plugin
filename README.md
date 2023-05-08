@@ -6,6 +6,11 @@ This is a Vite plugin for [MasterTS](https://github.com/DeepDoge/master-ts).
 
 This plugin updates your MasterTS code to run faster, by using cache or baking things on compile time.
 
+# Install
+```bash
+npm i github:DeepDoge/master-ts-vite-plugin#0.0.3
+```
+
 # Rules
 
 -   Nothing in the MasterTS, no feature should require a preprocessor
