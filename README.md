@@ -8,7 +8,7 @@ This plugin updates your MasterTS code to run faster, by using cache or baking t
 
 # Install
 ```bash
-npm i github:DeepDoge/master-ts-vite-plugin#0.0.3
+npm i github:DeepDoge/master-ts-vite-plugin#0.0.2
 ```
 
 # Rules
