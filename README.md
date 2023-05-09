@@ -7,9 +7,8 @@ This is a Vite plugin for [MasterTS](https://github.com/DeepDoge/master-ts).
 This plugin updates your MasterTS code to run faster, by using cache or baking things on compile time.
 
 # Install
-```bash
-npm i github:DeepDoge/master-ts-vite-plugin#0.0.2
-```
+
+[Install Instructions](https://github.com/DeepDoge/typify-contracts/releases)
 
 # Rules
 
