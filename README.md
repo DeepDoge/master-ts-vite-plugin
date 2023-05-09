@@ -8,7 +8,7 @@ This plugin updates your MasterTS code to run faster, by using cache or baking t
 
 # Install
 
-[Install Instructions](https://github.com/DeepDoge/typify-contracts/releases)
+[Install Instructions](https://github.com/DeepDoge/master-ts-vite-plugin/releases)
 
 # Rules
 
