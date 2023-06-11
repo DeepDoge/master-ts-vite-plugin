@@ -1,6 +1,4 @@
 import fs from "fs"
-import { parseTemplateDescriptor } from "master-ts/library/template/parse/descriptor"
-import { parseTemplateHtml } from "master-ts/library/template/parse/html"
 import path from "path"
 import typescript from "typescript"
 
@@ -9,18 +7,13 @@ const preprocessorFilename = path.join("node_modules", "master-ts-vite-plugin", 
 const preprocessorTs = fs.readFileSync(preprocessorFilename, "utf8")
 const preprocessorJs = typescript.transpile(preprocessorTs, { module: "commonjs" }, preprocessorFilename)
 
-const { preprocess } = new Function("args", `const exports = {}; ${preprocessorJs}; return exports`)([
-	typescript,
-	parseTemplateHtml,
-	parseTemplateDescriptor,
-	parseTemplateHtml,
-])
+const { preprocess } = new Function("args", `const exports = {}; ${preprocessorJs}; return exports`)([])
 
-export const masterTsPlugin = {
+export const masterTsPlugin = (typescript, parseTemplateHtml, parseTemplateDescriptor) => ({
 	name: "transform-file",
 	transform(src, filename) {
 		return {
 			code: preprocess(src, filename),
 		}
 	},
-}
+})

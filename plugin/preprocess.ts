@@ -1,14 +1,16 @@
-import type { TemplateDescriptor, parseTemplateDescriptor as _parseTemplateDescriptor } from "master-ts/library/template/parse/descriptor"
-import type { parseTemplateHtml as _parseTemplateHtml } from "master-ts/library/template/parse/html"
-import type { parseTemplate as _parseTemplate } from "master-ts/library/template/parse/template"
-import type _typescript from "typescript"
+import type { TemplateDescriptor, parseTemplateDescriptor as parseTemplateDescriptor_ } from "master-ts/library/template/parse/descriptor"
+import type { parseTemplateHtml as parseTemplateHtml_ } from "master-ts/library/template/parse/html"
+import type typescript_ from "typescript"
 import type { ImportDeclaration, Node, StringLiteral, TaggedTemplateExpression } from "typescript"
 
-declare const args: [typeof _typescript, typeof _parseTemplateHtml, typeof _parseTemplateDescriptor, typeof _parseTemplate]
-const [typescript, parseTemplateHtml, parseTemplateDescriptor /*, parseTemplate */] = args
-
 const fileRegex = /\.(ts)$/
-export function preprocess(src: string, filename: string) {
+export function preprocess(
+	src: string,
+	filename: string,
+	typescript: typeof typescript_,
+	parseTemplateHtml: typeof parseTemplateHtml_,
+	parseTemplateDescriptor: typeof parseTemplateDescriptor_
+) {
 	if (!fileRegex.test(filename)) return
 
 	type ImportName = {
