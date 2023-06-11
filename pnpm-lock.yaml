@@ -1,9 +1,9 @@
 lockfileVersion: '6.0'
 
 dependencies:
-  parse-literals:
-    specifier: ^1.2.1
-    version: 1.2.1
+  master-ts:
+    specifier: github:DeepDoge/master-ts#0.0.24
+    version: github.com/DeepDoge/master-ts/25aac7c12bbc73d7961a88ac80a580476dfcd27e
   typescript:
     specifier: ^5.0.4
     version: 5.0.4
@@ -776,12 +776,6 @@ packages:
       callsites: 3.1.0
     dev: true
 
-  /parse-literals@1.2.1:
-    resolution: {integrity: sha512-Ml0w104Ph2wwzuRdxrg9booVWsngXbB4bZ5T2z6WyF8b5oaNkUmBiDtahi34yUIpXD8Y13JjAK6UyIyApJ73RQ==}
-    dependencies:
-      typescript: 4.9.5
-    dev: false
-
   /path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
     engines: {node: '>=8'}
@@ -948,12 +942,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
-    hasBin: true
-    dev: false
-
   /typescript@5.0.4:
     resolution: {integrity: sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==}
     engines: {node: '>=12.20'}
@@ -990,3 +978,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  github.com/DeepDoge/master-ts/25aac7c12bbc73d7961a88ac80a580476dfcd27e:
+    resolution: {tarball: https://codeload.github.com/DeepDoge/master-ts/tar.gz/25aac7c12bbc73d7961a88ac80a580476dfcd27e}
+    name: master-ts
+    version: 0.0.0
+    dev: false
