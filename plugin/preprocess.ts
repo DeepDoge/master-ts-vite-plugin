@@ -181,9 +181,9 @@ export function preprocess(
 	}
 
 	function codefy(obj: unknown): string {
-		const code: string[] = []
+		function processValue(value: unknown): string {
+			const code: string[] = []
 
-		function processValue(value: unknown): void {
 			if (value instanceof Map) {
 				code.push("new Map([")
 				value.forEach((val, key) => {
@@ -211,16 +211,17 @@ export function preprocess(
 				})
 				code.push("}")
 			} else if (typeof value === "string") {
-				code.push(`"${value}"`)
+				code.push(JSON.stringify(value))
 			} else if (typeof value === "number" || typeof value === "boolean") {
 				code.push(`${value}`)
 			} else {
 				code.push("null")
 			}
+
+			return code.join("")
 		}
 
-		processValue(obj)
-		return code.join("")
+		return processValue(obj)
 	}
 
 	function codifyImports() {
