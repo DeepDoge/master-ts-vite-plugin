@@ -187,7 +187,7 @@ export function preprocess(
 		const code = `{
 		html: ${htmlCode},
 		valueDescriptors: ${JSON.stringify(valueDescriptors)},
-		refDataMap: new Map(${[...refDataMap.entries()]})
+		refDataMap: new Map(${JSON.stringify([...refDataMap.entries()])})
 	  };`
 
 		return code
