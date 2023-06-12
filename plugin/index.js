@@ -14,7 +14,6 @@ export const masterTsPlugin = (...args) => ({
 	name: "transform-file",
 	transform(src, filename) {
 		const code = preprocess(src, filename, ...args)
-		console.log(code)
 		return { code }
 	},
 })
