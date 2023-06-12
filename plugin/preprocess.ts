@@ -1,6 +1,6 @@
 import type { TemplateDescriptor, parseTemplateDescriptor as parseTemplateDescriptor_ } from "master-ts/library/template/parse/descriptor"
 import type { parseTemplateHtml as parseTemplateHtml_ } from "master-ts/library/template/parse/html"
-import type { parseLiterals as parseLiterals_ } from "parse-literals"
+import type { TemplatePart, parseLiterals as parseLiterals_ } from "parse-literals"
 import type typescript_ from "typescript"
 import type { ImportDeclaration, Node, StringLiteral, TaggedTemplateExpression } from "typescript"
 declare const args: [typeof parseLiterals_]
@@ -23,6 +23,7 @@ export function preprocess(
 	}
 
 	type ImportStatement = {
+		text: string
 		default: string | null
 		names: ImportName[]
 		from: string
@@ -51,14 +52,17 @@ export function preprocess(
 		const from = (node.moduleSpecifier as StringLiteral).text
 		const importClause = node.importClause
 
+		const importStatement: ImportStatement = {
+			text: node.getText(),
+			default: null,
+			names: [],
+			from,
+		}
+
 		if (importClause) {
 			const { name, namedBindings } = importClause
 
-			const importStatement: ImportStatement = {
-				default: name ? name.text : null,
-				names: [],
-				from,
-			}
+			importStatement.default = name ? name.text : null
 
 			if (namedBindings) {
 				if (typescript.isNamespaceImport(namedBindings)) {
@@ -76,9 +80,8 @@ export function preprocess(
 					importStatement.names = names
 				}
 			}
-
-			imports.push(importStatement)
 		}
+		imports.push(importStatement)
 
 		return ""
 	}
@@ -91,6 +94,7 @@ export function preprocess(
 		}
 
 		imports.push({
+			text: `import { ${name} } from ${JSON.stringify(from)}`,
 			default: null,
 			from,
 			names: [{ name, alias: null, type: false }],
@@ -130,8 +134,13 @@ export function preprocess(
 			case htmlTag: {
 				const htmlTagIndex = htmlTagCounter++
 				const newTagName = `__html__${htmlTagIndex}`
-				const htmlTexts = parseLiterals(node.getText())[0]!.parts.map((part) => part.text)
 
+				const newCode = `${node.getFullText().substring(0, node.getLeadingTriviaWidth())}${newTagName}${processChildrenOf(
+					node.getChildAt(1)
+				)}`
+
+				const templateParts = parseLiterals(newCode)[0]!.parts
+				const htmlTexts = templateParts.map((part) => part.text)
 				const templateDescriptor = parseTemplateDescriptor(parseTemplateHtml(htmlTexts as readonly string[] as TemplateStringsArray))
 
 				const createCachedHtmlFunctionName = addOrReturnImport("master-ts/library/template/cache", "createCachedHtml")
@@ -140,17 +149,40 @@ export function preprocess(
 
 				// TODO: also bake the template
 
-				return `${node.getFullText().substring(0, node.getLeadingTriviaWidth())}${newTagName}${node.getChildAt(1).getText()}`
+				return removeParts(templateParts, newCode)
 			}
 			default:
 				return node.getFullText()
 		}
 	}
 
+	function removeParts(parts: TemplatePart[], inputString: string): string {
+		let result = ""
+
+		// Sort parts in ascending order based on the start index
+		parts.sort((a, b) => a.start - b.start)
+
+		let lastIndex = 0
+		for (const part of parts) {
+			const { start, end } = part
+
+			// Append the substring before the current part
+			result += inputString.slice(lastIndex, start)
+
+			// Update the lastIndex to the end index of the current part
+			lastIndex = end
+		}
+
+		// Append the remaining substring after the last part
+		result += inputString.slice(lastIndex)
+
+		return result
+	}
+
 	function codifyTemplateDescriptor(templateDescriptor: TemplateDescriptor) {
 		const { html, valueDescriptors, refDataMap } = templateDescriptor
 		// Generate code for the HTML string
-		const htmlCode = `\`${html}\``
+		const htmlCode = `\`${minifyHtml(html)}\``
 
 		const code = `{
 		html: ${htmlCode},
@@ -162,29 +194,11 @@ export function preprocess(
 	}
 
 	function codifyImports() {
-		let importStatements = ""
-
-		for (const importStatement of imports) {
-			let importNames = ""
-
-			importNames = importStatement.names
-				.map((importName) => {
-					const name = importName.alias || importName.name
-					return importName.type ? `${importName.name} as ${name}` : name
-				})
-				.join(", ")
-
-			const defaultImport = importStatement.default ? `${importStatement.default}, ` : ""
-
-			importStatements += `import ${defaultImport}{ ${importNames} } from '${importStatement.from}';\n`
-		}
-
-		return importStatements
+		return imports.map((item) => item.text).join(";\n")
 	}
 
 	const processResult = processChildrenOf(rootNode)
-	const resultFile = `${codifyImports()}\n\n${addToTop.join("\n")};\n\n${processResult}`
-	return resultFile
+	return `${codifyImports()}\n\n${addToTop.join("\n")};\n\n${processResult}`
 }
 
 function minifyCss(css: string) {
