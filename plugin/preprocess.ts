@@ -234,10 +234,10 @@ export function preprocess(
 
 function minifyCss(css: string) {
 	// remove all whitespace that is not inside a string
-	return css.replace(/([^"'])(\s+)/g, "$1 ")
+	return css.replace(/([^"'])(\s+)/g, "$1 ").trim()
 }
 
 function minifyHtml(html: string) {
 	// remove all whitespace that is not inside a string
-	return html.replace(/([^"'])(\s+)/g, "$1 ")
+	return html.replace(/([^"'])(\s+)/g, "$1 ").trim()
 }
