@@ -1,4 +1,4 @@
-import type { TemplateDescriptor, parseTemplateDescriptor as parseTemplateDescriptor_ } from "master-ts/library/template/parse/descriptor"
+import type { parseTemplateDescriptor as parseTemplateDescriptor_ } from "master-ts/library/template/parse/descriptor"
 import type { parseTemplateHtml as parseTemplateHtml_ } from "master-ts/library/template/parse/html"
 import type { TemplatePart, parseLiterals as parseLiterals_ } from "parse-literals"
 import type typescript_ from "typescript"
@@ -142,9 +142,10 @@ export function preprocess(
 				const templateParts = parseLiterals(newCode)[0]!.parts
 				const htmlTexts = templateParts.map((part) => part.text)
 				const templateDescriptor = parseTemplateDescriptor(parseTemplateHtml(htmlTexts as readonly string[] as TemplateStringsArray))
+				templateDescriptor.html = minifyHtml(templateDescriptor.html)
 
 				const createCachedHtmlFunctionName = addOrReturnImport("master-ts/library/template/cache", "createCachedHtml")
-				addToTop.push(`const ${newTagName}_descriptor = ${codifyTemplateDescriptor(templateDescriptor)}`)
+				addToTop.push(`const ${newTagName}_descriptor = ${codefy(templateDescriptor)}`)
 				addToTop.push(`const ${newTagName} = ${createCachedHtmlFunctionName}(${newTagName}_descriptor)`)
 
 				// TODO: also bake the template
@@ -179,18 +180,47 @@ export function preprocess(
 		return result
 	}
 
-	function codifyTemplateDescriptor(templateDescriptor: TemplateDescriptor) {
-		const { html, valueDescriptors, refDataMap } = templateDescriptor
-		// Generate code for the HTML string
-		const htmlCode = `\`${minifyHtml(html)}\``
+	function codefy(obj: unknown): string {
+		const code: string[] = []
 
-		const code = `{
-		html: ${htmlCode},
-		valueDescriptors: ${JSON.stringify(valueDescriptors)},
-		refDataMap: new Map(${JSON.stringify([...refDataMap.entries()])})
-	  };`
+		function processValue(value: unknown): void {
+			if (value instanceof Map) {
+				code.push("new Map([")
+				value.forEach((val, key) => {
+					code.push(`[${processValue(key)}, ${processValue(val)}],`)
+				})
+				code.push("])")
+			} else if (value instanceof Set) {
+				code.push("new Set([")
+				value.forEach((val) => {
+					code.push(`${processValue(val)},`)
+				})
+				code.push("])")
+			} else if (value instanceof Date) {
+				code.push(`new Date(${value.getTime()})`)
+			} else if (Array.isArray(value)) {
+				code.push("[")
+				value.forEach((item) => {
+					code.push(`${processValue(item)},`)
+				})
+				code.push("]")
+			} else if (typeof value === "object" && value !== null) {
+				code.push("{")
+				Object.entries(value as Record<string, unknown>).forEach(([key, val]) => {
+					code.push(`"${key}": ${processValue(val)},`)
+				})
+				code.push("}")
+			} else if (typeof value === "string") {
+				code.push(`"${value}"`)
+			} else if (typeof value === "number" || typeof value === "boolean") {
+				code.push(`${value}`)
+			} else {
+				code.push("null")
+			}
+		}
 
-		return code
+		processValue(obj)
+		return code.join("")
 	}
 
 	function codifyImports() {
