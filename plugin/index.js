@@ -1,4 +1,5 @@
 import fs from "fs"
+import { parseLiterals } from "parse-literals"
 import path from "path"
 import typescript from "typescript"
 
@@ -7,13 +8,13 @@ const preprocessorFilename = path.join("node_modules", "master-ts-vite-plugin", 
 const preprocessorTs = fs.readFileSync(preprocessorFilename, "utf8")
 const preprocessorJs = typescript.transpile(preprocessorTs, { module: "commonjs" }, preprocessorFilename)
 
-const { preprocess } = new Function("args", `const exports = {}; ${preprocessorJs}; return exports`)([])
+const { preprocess } = new Function("args", `const exports = {}; ${preprocessorJs}; return exports`)([parseLiterals])
 
-export const masterTsPlugin = (typescript, parseTemplateHtml, parseTemplateDescriptor) => ({
+export const masterTsPlugin = (...args) => ({
 	name: "transform-file",
 	transform(src, filename) {
-		return {
-			code: preprocess(src, filename),
-		}
+		const code = preprocess(src, filename, ...args)
+		console.log(code)
+		return { code }
 	},
 })

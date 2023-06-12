@@ -1,7 +1,10 @@
 import type { TemplateDescriptor, parseTemplateDescriptor as parseTemplateDescriptor_ } from "master-ts/library/template/parse/descriptor"
 import type { parseTemplateHtml as parseTemplateHtml_ } from "master-ts/library/template/parse/html"
+import type { parseLiterals as parseLiterals_ } from "parse-literals"
 import type typescript_ from "typescript"
 import type { ImportDeclaration, Node, StringLiteral, TaggedTemplateExpression } from "typescript"
+declare const args: [typeof parseLiterals_]
+const [parseLiterals] = args
 
 const fileRegex = /\.(ts)$/
 export function preprocess(
@@ -10,8 +13,8 @@ export function preprocess(
 	typescript: typeof typescript_,
 	parseTemplateHtml: typeof parseTemplateHtml_,
 	parseTemplateDescriptor: typeof parseTemplateDescriptor_
-) {
-	if (!fileRegex.test(filename)) return
+): string {
+	if (!fileRegex.test(filename)) return src
 
 	type ImportName = {
 		type: boolean
@@ -53,7 +56,7 @@ export function preprocess(
 
 			const importStatement: ImportStatement = {
 				default: name ? name.text : null,
-				names: null!,
+				names: [],
 				from,
 			}
 
@@ -127,17 +130,8 @@ export function preprocess(
 			case htmlTag: {
 				const htmlTagIndex = htmlTagCounter++
 				const newTagName = `__html__${htmlTagIndex}`
-				const htmlTexts: string[] = []
-				const codeTexts: string[] = []
-				const children = node.getChildren()
-				for (const childNode of children) {
-					if (!typescript.isNoSubstitutionTemplateLiteral(childNode)) {
-						codeTexts.push(processChildrenOf(childNode))
-						continue
-					}
-					htmlTexts.push(childNode.getText())
-					codeTexts.push(childNode.getText())
-				}
+				const htmlTexts = parseLiterals(node.getText())[0]!.parts.map((part) => part.text)
+
 				const templateDescriptor = parseTemplateDescriptor(parseTemplateHtml(htmlTexts as readonly string[] as TemplateStringsArray))
 
 				const createCachedHtmlFunctionName = addOrReturnImport("master-ts/library/template/cache", "createCachedHtml")
@@ -146,7 +140,7 @@ export function preprocess(
 
 				// TODO: also bake the template
 
-				return `${node.getFullText().substring(0, node.getLeadingTriviaWidth())}${newTagName}\`${codeTexts.join("")}\``
+				return `${node.getFullText().substring(0, node.getLeadingTriviaWidth())}${newTagName}${node.getChildAt(1).getText()}`
 			}
 			default:
 				return node.getFullText()
@@ -155,43 +149,13 @@ export function preprocess(
 
 	function codifyTemplateDescriptor(templateDescriptor: TemplateDescriptor) {
 		const { html, valueDescriptors, refDataMap } = templateDescriptor
-
 		// Generate code for the HTML string
 		const htmlCode = `\`${html}\``
 
-		// Generate code for the value descriptors
-		const valueDescriptorsCode = valueDescriptors
-			.map((valueDescriptor) => {
-				const { type, ref, ...props } = valueDescriptor
-				const propsCode = JSON.stringify(props)
-				return `createValueDescriptor('${type}', ${propsCode})`
-			})
-			.join(",\n")
-
-		// Generate code for the reference data map
-		const refDataMapCode = Array.from(refDataMap.entries())
-			.map(([ref, refData]) => {
-				const attributesCode = Array.from(refData.attributes.entries())
-					.map(([name, attributeData]) => {
-						const indexesCode = JSON.stringify(attributeData.indexes)
-						const partsCode = attributeData.parts ? JSON.stringify(attributeData.parts) : "null"
-						return `"${name}": { indexes: ${indexesCode}, parts: ${partsCode} }`
-					})
-					.join(",\n")
-
-				return `"${ref}": { attributes: new Map([${attributesCode}]) }`
-			})
-			.join(",\n")
-
-		// Generate the final code
-		const code = `const templateDescriptor = {
+		const code = `{
 		html: ${htmlCode},
-		valueDescriptors: [
-		  ${valueDescriptorsCode}
-		],
-		refDataMap: new Map([
-		  ${refDataMapCode}
-		])
+		valueDescriptors: ${JSON.stringify(valueDescriptors)},
+		refDataMap: new Map(${[...refDataMap.entries()]})
 	  };`
 
 		return code
@@ -220,7 +184,6 @@ export function preprocess(
 
 	const processResult = processChildrenOf(rootNode)
 	const resultFile = `${codifyImports()}\n\n${addToTop.join("\n")};\n\n${processResult}`
-	console.log(resultFile)
 	return resultFile
 }
 
