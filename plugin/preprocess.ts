@@ -1,19 +1,18 @@
-import type { parseTemplateDescriptor as parseTemplateDescriptor_ } from "master-ts/library/template/parse/descriptor"
-import type { parseTemplateHtml as parseTemplateHtml_ } from "master-ts/library/template/parse/html"
-import type { TemplatePart, parseLiterals as parseLiterals_ } from "parse-literals"
+import type { parse as parse_ } from "master-ts/library/template/parse"
+import type { TemplatePart } from "parse-literals"
+import { parseLiterals } from "parse-literals"
 import type typescript_ from "typescript"
 import type { ImportDeclaration, Node, StringLiteral, TaggedTemplateExpression } from "typescript"
-declare const args: [typeof parseLiterals_]
-const [parseLiterals] = args
+
+export type Dependencies = {
+	typescript: typeof typescript_
+	parse: typeof parse_
+}
 
 const fileRegex = /\.(ts)$/
-export function preprocess(
-	src: string,
-	filename: string,
-	typescript: typeof typescript_,
-	parseTemplateHtml: typeof parseTemplateHtml_,
-	parseTemplateDescriptor: typeof parseTemplateDescriptor_
-): string {
+export function preprocess(src: string, filename: string, deps: Dependencies): string {
+	const { typescript, parse } = deps
+
 	if (!fileRegex.test(filename)) return src
 
 	type ImportName = {
@@ -141,7 +140,7 @@ export function preprocess(
 
 				const templateParts = parseLiterals(newCode)[0]!.parts
 				const htmlTexts = templateParts.map((part) => part.text)
-				const templateDescriptor = parseTemplateDescriptor(parseTemplateHtml(htmlTexts as readonly string[] as TemplateStringsArray))
+				const templateDescriptor = parse.descriptor(parse.html(htmlTexts as readonly string[] as TemplateStringsArray))
 				templateDescriptor.html = minifyHtml(templateDescriptor.html)
 
 				const createCachedHtmlFunctionName = addOrReturnImport("master-ts/library/template/cache", "createCachedHtml")
