@@ -1,21 +1,46 @@
-# What is this?
+# MasterTS Vite Plugin
 
-This is a Vite plugin for [MasterTS](https://github.com/DeepDoge/master-ts).
+The MasterTS Vite Plugin is a powerful addition to [MasterTS](https://github.com/DeepDoge/master-ts) that optimizes the runtime performance of your code by leveraging caching and build-time optimizations.
 
-# What does this do?
+## What does it do?
 
-This plugin updates your MasterTS code to run faster, by using cache or baking things on compile time.
+This plugin enhances your MasterTS code execution speed by utilizing caching mechanisms and performing build-time optimizations.
 
-# Install
+## Usage
 
-[Install Instructions](https://github.com/DeepDoge/master-ts-vite-plugin/releases)
+To use the MasterTS Vite Plugin, follow these steps:
 
-# Rules
+1. In the root of your Vite project, locate the `vite.config.ts` file. If it doesn't exist, create it.
 
--   Nothing in the MasterTS, no feature should require a preprocessor
--   Code should run just fine without this.
--   Only job of this is making it faster.
+2. Inside the `vite.config.ts` file, import the following dependencies:
+   - `masterTs` from `"master-ts-vite-plugin/plugin"`
+   - `parse` from `"master-ts/library/template/parse"`
+   - `typescript` from `"typescript"`
 
-# TODO
+   *Please note that the `master-ts` and `master-ts-vite-plugin` modules have TypeScript (TS) files only. However, while `vite.config.ts` is a TS file, it doesn't allow importing TS files from modules directly. As a workaround, you can import these dependencies from `node_modules` using the relative path.*
 
--   This code is really bad and using bunch of regex, this needs a rewrite at some point.
+3. Within the `plugins` section of the configuration, add `masterTs({ typescript, parse })` as a plugin.
+
+   Here's an example configuration snippet:
+   ```ts
+   // vite.config.ts
+   import { masterTs } from "./node_modules/master-ts-vite-plugin/plugin"
+   import { parse } from "./node_modules/master-ts/library/template/parse"
+   import typescript from "typescript"
+   import { defineConfig } from "vite"
+
+   export default defineConfig({
+     plugins: [masterTs({ parse, typescript })],
+     // ...
+   })
+   ```
+
+## Install
+
+For installation instructions, please refer to the [MasterTS Vite Plugin Releases](https://github.com/DeepDoge/master-ts-vite-plugin/releases) page.
+
+## Guidelines
+
+- The MasterTS library itself does not require this plugin for any of its features.
+- Your code should function perfectly fine without this plugin.
+- The sole purpose of the MasterTS Vite Plugin is to optimize the runtime performance of your code and make it faster.
