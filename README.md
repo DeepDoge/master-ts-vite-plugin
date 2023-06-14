@@ -17,7 +17,7 @@ To use the MasterTS Vite Plugin, follow these steps:
    - `parse` from `"master-ts/library/template/parse"`
    - `typescript` from `"typescript"`
 
-   *Please note that the `master-ts` and `master-ts-vite-plugin` modules have TypeScript (TS) files only. However, while `vite.config.ts` is a TS file, it doesn't allow importing TS files from modules directly. As a workaround, you can import these dependencies from `node_modules` using the relative path.*
+   *Please note that the `master-ts` and `master-ts-vite-plugin` modules have TypeScript (TS) files only. However, while `vite.config.ts` is a TS file, it doesn't allow importing TS files from modules directly. As a [workaround](https://github.com/vitejs/vite/issues/5370#issuecomment-1339022262), you can import these dependencies from `node_modules` using the relative path.*
 
 3. Within the `plugins` section of the configuration, add `masterTs({ typescript, parse })` as a plugin.
 
